@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { contactRepo } from "../repositories/ContactRepo.js";
 
 class ContactController {
-  async index(request: Request, response: Response): Promise<any> {
-    const contacts = await contactRepo.findAll();
+  async index(request: Request, response: Response) {
+    const { orderBy = "ASC" } = request.query;
+    const contacts = await contactRepo.findAll(orderBy as string);
     response.json(contacts);
   }
 
-  async show(request: Request, response: Response): Promise<any> {
+  async show(request: Request, response: Response) {
     const { id } = request.params;
     const contact = await contactRepo.findById(id);
     if (!contact) {
@@ -16,7 +17,7 @@ class ContactController {
     response.json(contact);
   }
 
-  async store(request: Request, response: Response): Promise<any> {
+  async store(request: Request, response: Response) {
     const { name, email, phone, category_id } = request.body;
 
     if (!name) {
@@ -39,10 +40,10 @@ class ContactController {
     response.status(201).json(contact);
   }
 
-  async update(request: Request, response: Response): Promise<any> {
+  async update(request: Request, response: Response) {
     const { id } = request.params;
-    const data = request.body;
-    if (!data.name) {
+    const { name, email, phone, category_id = null } = request.body;
+    if (!name) {
       return response.status(400).json({ error: "name is required" });
     }
     const contact = await contactRepo.findById(id);
@@ -51,16 +52,19 @@ class ContactController {
       return response.status(404).json({ message: "user not found" });
     }
 
-    const updateContact = await contactRepo.update(id, data);
+    const updateContact = await contactRepo.update({
+      id,
+      name,
+      email,
+      phone,
+      category_id,
+    });
     response.json(updateContact);
   }
 
-  async delete(request: Request, response: Response): Promise<any> {
+  async delete(request: Request, response: Response) {
     const { id } = request.params;
-    const contact = await contactRepo.findById(id);
-    if (!contact) {
-      return response.status(404).json({ message: "user not found" });
-    }
+
     await contactRepo.delete(id);
     response.sendStatus(204);
   }
