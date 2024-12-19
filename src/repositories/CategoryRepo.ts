@@ -2,7 +2,9 @@ import { database } from "../database/index.js";
 
 class CategoryRepo {
   async findAll() {
-    const row = await database.query(`SELECT * FROM categories`);
+    const row = await database.query(`
+      SELECT * FROM categories
+      `);
     return row;
   }
 

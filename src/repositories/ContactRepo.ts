@@ -5,15 +5,27 @@ class ContactRepo {
   async findAll(orderBy = "ASC") {
     const direction = orderBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const rows = await database.query(
-      `SELECT * FROM contacts ORDER BY name ${direction};`
+      `
+      SELECT cont.*, cat.name AS category_name
+      FROM contacts AS cont
+      LEFT JOIN categories AS cat
+      ON cat.id = cont.category_id
+      ORDER BY name ${direction};
+       `
     );
     return rows;
   }
 
   async findById(id: string) {
-    const [row] = await database.query(`SELECT * FROM contacts WHERE id = $1`, [
-      id,
-    ]);
+    const [row] = await database.query(
+      `
+      SELECT cont.*, cat.name AS category_name
+      FROM contacts AS cont
+      LEFT JOIN categories AS cat
+      ON cat.id = cont.category_id
+      WHERE cont.id = $1`,
+      [id]
+    );
     return row;
   }
 

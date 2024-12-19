@@ -10,7 +10,8 @@ class CategoryController {
   async show(request: Request, response: Response) {
     const { id } = request.params;
     if (!id) {
-      return response.status(400).json({ error: "category not found." });
+      response.status(400).json({ error: "category not found." });
+      return;
     }
     const category = await categoryRepo.findById(id);
     response.json(category);
