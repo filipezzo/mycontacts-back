@@ -12,7 +12,7 @@ class ContactController {
     const { id } = request.params;
     const contact = await contactRepo.findById(id);
     if (!contact) {
-      response.status(404).json({ message: "user not found" });
+      response.status(404).json({ message: "contact not found." });
       return;
     }
     response.json(contact);
@@ -48,10 +48,18 @@ class ContactController {
       response.status(400).json({ error: "name is required" });
       return;
     }
+
+    const alreadyHasUserWithEmail = await contactRepo.findByEmail(email);
+    if (alreadyHasUserWithEmail) {
+      response
+        .status(400)
+        .json({ message: "another contact already has this email" });
+    }
+
     const contact = await contactRepo.findById(id);
 
     if (!contact) {
-      response.status(404).json({ message: "user not found" });
+      response.status(404).json({ message: "contact not found" });
       return;
     }
 
